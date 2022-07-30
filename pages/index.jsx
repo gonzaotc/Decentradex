@@ -93,7 +93,7 @@ const Home = () => {
           name="description"
           content="A React + Solidity small fun app to mint and evolve Pokemons!"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href=".favicon.ico" />
       </Head>
 
       <Banner contract={contract} />
