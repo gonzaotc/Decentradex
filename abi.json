@@ -63,6 +63,12 @@
       },
       {
         "indexed": false,
+        "internalType": "uint256[]",
+        "name": "color",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
         "internalType": "string[]",
         "name": "elements",
         "type": "string[]"
@@ -166,6 +172,11 @@
             "internalType": "uint256",
             "name": "id",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "color",
+            "type": "uint256[]"
           },
           {
             "internalType": "uint256",
@@ -288,6 +299,11 @@
             "internalType": "uint256",
             "name": "id",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "color",
+            "type": "uint256[]"
           },
           {
             "internalType": "uint256",

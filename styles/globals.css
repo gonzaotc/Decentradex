@@ -6,7 +6,7 @@ h1 {
   @apply text-3xl font-semibold text-white;
 }
 h2 {
-  @apply text-2xl font-semibold text-white;
+  @apply text-[1.4rem] font-semibold text-white;
 }
 h3 {
   @apply text-lg font-semibold text-white;
@@ -23,7 +23,16 @@ p {
 }
 
 .btn {
-  @apply bg-green-500 rounded-lg py-2 px-6 mr-2 font-semibold;
+  @apply bg-green-500 rounded-lg py-2 px-6  font-semibold;
+  @apply flex items-center justify-center;
   @apply hover:bg-green-600 transition duration-100;
-  @apply disabled:bg-green-400;
+  @apply disabled:bg-green-300;
 }
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+

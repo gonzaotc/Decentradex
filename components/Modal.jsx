@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { Loading, Tooltip, css } from "@nextui-org/react";
+import Error from "../icons/Error";
 
 const Modal = ({ onClose, contract }) => {
   const [name, setName] = useState("");
+  const [inputError, setInputError] = useState({ display: false, error: "" });
+  const [firstInputRender, setFirstInputRender] = useState(true);
+
+  // The contractNameArg will be set in the mintButton call, to evitate
+  //  multiple usePrepareContractWrite when the user changes the name input
+  // This is actually not working, because it says that mint() it's not defined.
+  const [contractNameArg, setContractNameArg] = useState("");
 
   const { config } = usePrepareContractWrite({
     ...contract,
@@ -10,44 +19,58 @@ const Modal = ({ onClose, contract }) => {
     args: [name],
   });
 
-  const { data, isLoading, isSuccess, write } = useContractWrite({
+  const {
+    data: mintData,
+    isError: isMintingError,
+    error: mintingError,
+    isLoading: isMintLoading,
+    isSuccess: isMintStarted,
+    write: mint,
+  } = useContractWrite({
     ...config,
+  });
 
-    // Function to invoke when an error is thrown while attempting to write.
-    onError(error) {
-      console.log("onError", error);
-    },
-    // Function fires before the contract write function and is passed same variables
-    // the contract write function would receive.Value returned from this function will
-    // be passed to both onError and onSettled functions in event of a failure.
-
-    // My notes: this gets trigerred when metamask is opened. 
-    onMutate({ args }) {
-      console.log("onMutate", { args });
-    },
-    // Function to invoke when write is settled (either successfully sent, or an error has thrown).
-    onSettled(data, error) {
-      console.log("onSettled", { data, error });
-    },
-    // Function to invoke when write is successful.
-    onSuccess(data) {
-      console.log("onSuccess", data);
-    },
+  const {
+    isSuccess: isTxSuccess,
+    isLoading: isTxLoading,
+    isError: isTxError,
+  } = useWaitForTransaction({
+    hash: mintData?.hash,
   });
 
   useEffect(() => {
-    console.log("data has changed", data);
-  }, [data]);
+    firstInputRender && setFirstInputRender(false);
+    setInputError({ display: false, error: "first render disable" });
+    if (!firstInputRender) {
+      if (name.length < 2) {
+        setInputError({ display: true, error: "The name length must be > 2" });
+      }
+      if (name.length >= 2 && name.length <= 20) {
+        setInputError({ display: false, error: "" });
+      }
+      if (name.length > 10) {
+        setInputError({ display: true, error: "The name length must be < 10" });
+      }
+    }
+  }, [name]);
+  {
+    /* mintData, isMintLoading, isMintStarted, isMintingError*/
+  }
+  {
+    /* isTxSuccess, isTxLoading,  isTxError */
+  }
+
   useEffect(() => {
-    console.log("isLoading has changed", isLoading);
-  }, [isLoading]);
-  useEffect(() => {
-    console.log("isScucess has changed", isSuccess);
-  }, [isSuccess]);
+    if (isTxSuccess) {
+      onClose();
+    }
+  }, [isTxSuccess]);
 
   const onMintPokemon = () => {
-    console.log("mintingg");
-    write();
+    console.log("trigering onMintPokemon");
+    // Falta agregar debouncing al minting
+    setContractNameArg(name);
+    mint();
   };
 
   return (
@@ -56,7 +79,7 @@ const Modal = ({ onClose, contract }) => {
       onClick={onClose}
     >
       <div
-        className="w-[320px] h-[185px] rounded-lg z-20 bg-neutral-800 drop-shadow-[0_0_15px_rgba(0,0,0,0.7)] py-4 px-4 flex flex-col justify-between"
+        className="w-[330px] h-[200px] rounded-lg z-20 bg-neutral-900 drop-shadow-[0_0_15px_rgba(0,0,0,0.7)] py-4 px-4 flex flex-col justify-between"
         onClick={e => {
           e.stopPropagation();
         }}
@@ -66,27 +89,67 @@ const Modal = ({ onClose, contract }) => {
           <label htmlFor="pokemonName" className="mr-2 text-lg">
             Name:
           </label>
-          <input
-            id="pokemonName"
-            type="text"
-            className="text-white py-1 px-2 rounded-md bg-white/10 flex items-center justify-center"
-            value={name}
-            onChange={e => {
-              setName(e.target.value);
-            }}
-          />
+          <span className="relative">
+            <input
+              id="pokemonName"
+              type="text"
+              className="text-white py-1 px-2 rounded-md bg-white/10 flex items-center justify-center"
+              value={name}
+              onChange={e => {
+                setName(e.target.value);
+              }}
+            />
+            {inputError.display && (
+              <p className="text-red-600 text-sm absolute top-[2.2rem]">{inputError.error}</p>
+            )}
+          </span>
         </span>
-        <button
-          className="btn mt-8 w-full"
-          disabled={name.length < 2}
-          onClick={() => {
-            if (name.length >= 2) {
-              onMintPokemon();
-            }
-          }}
+
+        {/* mintData, isMintLoading, isMintStarted, isMintingError*/}
+        {/* isTxSuccess, isTxLoading,  isTxError */}
+        <Tooltip
+          content={
+            isMintingError && (
+              <span className="flex items-center">
+                <Error className="w-5 h-5 mr-1 text-red-500" />
+                <p className="text-red-500">{mintingError.toString()}</p>
+              </span>
+            )
+          }
+          placement="bottom"
+          color="invert"
+          rounded={false}
+          className={"mt-8 !w-full"}
         >
-          MINT POKEMON
-        </button>
+          <button
+            className="btn w-full h-10"
+            disabled={inputError.error || isMintLoading || isTxLoading}
+            onClick={() => {
+              if (!inputError.error) {
+                onMintPokemon();
+              }
+            }}
+          >
+            <p className="mr-2">
+              {isMintLoading && "Waiting confirmation"}
+              {isMintingError && "Transaction rejected. Try Again"}
+              {isTxError && "Transaction error"}
+              {isTxLoading && "Waiting transaction"}
+              {isTxSuccess && "Transaction processed!"}
+
+              {!isMintLoading &&
+                !isMintingError &&
+                !isTxLoading &&
+                !isTxError &&
+                !isTxSuccess &&
+                "MINT POKEMON"}
+            </p>
+
+            {(isMintLoading || isTxLoading) && (
+              <Loading size="sm" color="currentColor" textColor={"primary"} />
+            )}
+          </button>
+        </Tooltip>
       </div>
     </div>
   );

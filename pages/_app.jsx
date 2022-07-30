@@ -10,7 +10,7 @@ const { chains, provider, webSocketProvider } = configureChains(
   [
     // chain.mainnet,
     // chain.polygon,
-    chain.polygonMumbai,
+    chain.goerli,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
       ? [chain.goerli, chain.kovan, chain.rinkeby, chain.ropsten]
       : []),

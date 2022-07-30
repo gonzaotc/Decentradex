@@ -13,6 +13,7 @@ contract PokemonFactory {
         address owner;
         string name;
         uint256 id;
+        uint256[] color;
         uint256 evolution;
         string[] elements;
         string[] weaknesses;
@@ -23,6 +24,7 @@ contract PokemonFactory {
         address owner,
         string name,
         uint256 id,
+        uint256[] color,
         string[] elements,
         string[] weaknesses
     );
@@ -169,6 +171,15 @@ contract PokemonFactory {
             _elementIndex4 = _elementIndex3;
         }
 
+        uint256[] memory _color = new uint256[](3);
+        rCounter++;
+        _color[0] = getRandom(0,255, _name, _id, rCounter);
+        rCounter++;
+        _color[1] = getRandom(0,255, _name, _id, rCounter);
+        rCounter++;
+        _color[2] = getRandom(0,255, _name, _id, rCounter);
+
+
         s_pokemons.push();
         Pokemon storage pokemon = s_pokemons[_id];
         pokemon.name = _name;
@@ -179,7 +190,14 @@ contract PokemonFactory {
 
         s_ownerPokemonCount[msg.sender]++;
         s_pokemonIdToOwner[_id] = msg.sender;
-        emit eventNewPokemon(msg.sender, _name, _id, _elements, _weaknesses);
+        emit eventNewPokemon(
+            msg.sender,
+            _name,
+            _id,
+            _color,
+            _elements,
+            _weaknesses
+        );
         // trainPokemon(_id);
     }
 

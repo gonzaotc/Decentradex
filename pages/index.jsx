@@ -3,20 +3,21 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import {
   useAccount,
-  useContract,
-  useProvider,
-  useContractEvent,
-  useContractRead,
+  // useContract,
+  // useProvider,
+  // useContractEvent,
+  // useContractRead,
   useContractReads,
-  useContractWrite,
+  // useContractWrite,
 } from "wagmi";
 import PokemonCard from "../components/PokemonCard";
 import abi from "../abi.json";
 import Modal from "../components/Modal";
+import PokemonContainer from "../components/PokemonContainer";
+import Banner from "../components/Banner";
 
 const Home = () => {
-  const { address, isConnecting, isDisconnected } = useAccount();
-  const [userAddress, setUserAddress] = useState(undefined);
+  const { address } = useAccount();
 
   const [ownedPokemons, setOwnedPokemons] = useState([]);
   const [notOwnedPokemons, setNotOwnedPokemons] = useState([]);
@@ -24,21 +25,15 @@ const Home = () => {
 
   const [modal, setModal] = useState(false);
 
-  // const provider = useProvider();
-  // const contract = useContract({
-  //   addressOrName: "0x01f63f2e5057452eb00d643fc0f4efb61e55f4ba",
-  //   contractInterface: abi,
-  // });
-
   const contract = {
-    addressOrName: "0x352f462ca60fb48ea0b576693c1ee32dc83cb573",
+    addressOrName: "0x4b76d2f2818265d7aa5e1df3ab0e44a4406a7e30",
     contractInterface: abi,
   };
 
   const {
     data,
-    isError: isReadError,
-    isLoading: isReadLoading,
+    // isError: isReadError,
+    // isLoading: isReadLoading,
   } = useContractReads({
     contracts: [
       {
@@ -65,18 +60,19 @@ const Home = () => {
   // 1. The user enters the app
   // 2. The user changes address
 
+
   useEffect(() => {
-    console.log("address", address);
-    console.log("data", data);
+    console.log("data from blockchain read has changed:", data);
     setLoadingPokemons(true);
     const owned = [];
     const notOwned = [];
-    console.log(data);
+    console.log(data)
     data[0].forEach(pokemon => {
       const formattedPokemon = {
         owner: pokemon.owner,
         name: pokemon.name,
         id: pokemon.id.toString(),
+        color: pokemon.color,
         evolution: pokemon.evolution.toString(),
         elements: pokemon.elements,
         weaknesses: pokemon.weaknesses,
@@ -89,17 +85,8 @@ const Home = () => {
     setLoadingPokemons(false);
   }, [address, data]);
 
-  // userAddress is only used to display it in the UI.
-  useEffect(() => {
-    if (address) {
-      setUserAddress(address);
-    } else {
-      setUserAddress(undefined);
-    }
-  }, [address]);
-
   return (
-    <div className={`bg-zinc-900 flex justify-center min-h-screen `}>
+    <div className={`bg-zinc-900 flex flex-col items-center min-h-screen `}>
       <Head>
         <title>Cryptopokemons</title>
         <meta
@@ -109,6 +96,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Banner contract={contract} />
       <div className="w-11/12 flex flex-col items-center">
         {modal && (
           <Modal
@@ -118,9 +106,8 @@ const Home = () => {
             }}
           />
         )}
-        <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-4 border-b-2 border-white/10">
-          <h1>Cryptopokemons</h1>
-          <h3>{userAddress}</h3>
+        <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">
+          <h1 className="text-[1.4rem] sm:text-3xl">Cryptopokemons</h1>
           <ConnectButton accountStatus="address" />
         </nav>
 
@@ -132,10 +119,10 @@ const Home = () => {
         {!loadingPokemons && (
           <main className="w-full flex flex-col">
             <>
-              <section className="flex mb-2">
+              <section className="flex mb-4">
                 {address && ownedPokemons.length < 3 && (
                   <button
-                    className="btn"
+                    className="btn mr-2 w-full sm:w-auto"
                     onClick={() => {
                       setModal(true);
                     }}
@@ -143,31 +130,33 @@ const Home = () => {
                     Mint Pokemon
                   </button>
                 )}
-                {ownedPokemons.length > 0 && <button className="btn">Train Pokemon</button>}
+                {ownedPokemons.length > 0 && (
+                  <button className="btn w-full sm:w-auto">Train Pokemon</button>
+                )}
               </section>
               {address && (
                 <section className="mb-4">
-                  <h3 className="mb-2">Your pokemons</h3>
-                  <div className="flex">
+                  <h2 className="mb-3">Your pokemons</h2>
+                  <PokemonContainer className="">
                     {ownedPokemons.map((pokemon, index) => (
                       <PokemonCard key={index} pokemon={pokemon} owned={true} />
                     ))}
                     {ownedPokemons.length === 0 && (
                       <p className="text-white">You dont own any cryptopokemons.</p>
                     )}
-                  </div>
+                  </PokemonContainer>
                 </section>
               )}
               <section className="mb-4">
-                <h3 className="mb-2">All the pokemons</h3>
-                <div className="flex">
+                <h2 className="mb-3">All the pokemons</h2>
+                <PokemonContainer className="">
                   {notOwnedPokemons.map((pokemon, index) => {
                     return <PokemonCard key={index} pokemon={pokemon} />;
                   })}
                   {notOwnedPokemons.length === 0 && (
                     <p className="text-white">There is no cryptopokemons made.</p>
                   )}
-                </div>
+                </PokemonContainer>
               </section>
             </>
           </main>
