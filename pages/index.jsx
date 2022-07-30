@@ -88,7 +88,7 @@ const Home = () => {
   return (
     <div className={`bg-zinc-900 flex flex-col items-center min-h-screen `}>
       <Head>
-        <title>Cryptopokemons</title>
+        <title>Decentradex</title>
         <meta
           name="description"
           content="A React + Solidity small fun app to mint and evolve Pokemons!"
@@ -107,7 +107,7 @@ const Home = () => {
           />
         )}
         <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">
-          <h1 className="text-[1.4rem] sm:text-3xl">Cryptopokemons</h1>
+          <h1 className="text-[1.4rem] sm:text-3xl">Decentradex</h1>
           <ConnectButton accountStatus="address" />
         </nav>
 
@@ -142,7 +142,7 @@ const Home = () => {
                       <PokemonCard key={index} pokemon={pokemon} owned={true} />
                     ))}
                     {ownedPokemons.length === 0 && (
-                      <p className="text-white">You dont own any cryptopokemons.</p>
+                      <p className="text-white">You dont own any pokemons.</p>
                     )}
                   </PokemonContainer>
                 </section>
