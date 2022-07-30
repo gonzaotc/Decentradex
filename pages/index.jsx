@@ -1,20 +1,14 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import {
-  useAccount,
-  // useContract,
-  // useProvider,
-  // useContractEvent,
-  // useContractRead,
-  useContractReads,
-  // useContractWrite,
-} from "wagmi";
+import { useAccount, useContractReads } from "wagmi";
 import PokemonCard from "../components/PokemonCard";
 import abi from "../abi.json";
 import Modal from "../components/Modal";
 import PokemonContainer from "../components/PokemonContainer";
 import Banner from "../components/Banner";
+import Mint from "../components/Mint";
+import Train from "../components/Train";
 
 const Home = () => {
   const { address } = useAccount();
@@ -23,7 +17,7 @@ const Home = () => {
   const [notOwnedPokemons, setNotOwnedPokemons] = useState([]);
   const [loadingPokemons, setLoadingPokemons] = useState(true);
 
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = useState({ display: false, content: "" });
 
   const contract = {
     addressOrName: "0x4b76d2f2818265d7aa5e1df3ab0e44a4406a7e30",
@@ -60,13 +54,12 @@ const Home = () => {
   // 1. The user enters the app
   // 2. The user changes address
 
-
   useEffect(() => {
     console.log("data from blockchain read has changed:", data);
     setLoadingPokemons(true);
     const owned = [];
     const notOwned = [];
-    console.log(data)
+    console.log(data);
     data[0].forEach(pokemon => {
       const formattedPokemon = {
         owner: pokemon.owner,
@@ -77,6 +70,7 @@ const Home = () => {
         elements: pokemon.elements,
         weaknesses: pokemon.weaknesses,
         skills: pokemon.skills,
+        lastTimeTrained: pokemon.lastTimeTrained.toString(),
       };
       pokemon.owner == address ? owned.push(formattedPokemon) : notOwned.push(formattedPokemon);
     });
@@ -98,13 +92,16 @@ const Home = () => {
 
       <Banner contract={contract} />
       <div className="w-11/12 flex flex-col items-center">
-        {modal && (
+        {modal.display && (
           <Modal
             contract={contract}
             onClose={() => {
-              setModal(false);
+              setModal({ display: false, content: "" });
             }}
-          />
+          >
+            {modal.content == "mint" && <Mint contract={contract} ownedPokemons={ownedPokemons} />}
+            {modal.content == "train" && <Train contract={contract} />}
+          </Modal>
         )}
         <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">
           <h1 className="text-[1.4rem] sm:text-3xl">Decentradex</h1>
@@ -124,14 +121,21 @@ const Home = () => {
                   <button
                     className="btn mr-2 w-full sm:w-auto"
                     onClick={() => {
-                      setModal(true);
+                      setModal({ display: true, content: "mint" });
                     }}
                   >
                     Mint Pokemon
                   </button>
                 )}
                 {ownedPokemons.length > 0 && (
-                  <button className="btn w-full sm:w-auto">Train Pokemon</button>
+                  <button
+                    className="btn w-full sm:w-auto"
+                    onClick={() => {
+                      setModal({ display: true, content: "train" });
+                    }}
+                  >
+                    Train Pokemon
+                  </button>
                 )}
               </section>
               {address && (

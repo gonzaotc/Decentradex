@@ -18,7 +18,14 @@ const PokemonCard = ({ pokemon, index, owned }) => {
     pokeDropShadow +
     pokeDropShadow +
     pokeDropShadow;
-  
+
+  let stars = "";
+  for (let i = 0; i < pokemon.evolution; i++) {
+    stars.concat("⭐");
+  }
+
+  let trainingDiff = new Date.now() - +pokemon.lastTimeTrained;
+  let pokemonCooldown = trainingDiff < 3600 ? trainingDiff / 60 : 0;
 
   return (
     <article
@@ -42,9 +49,10 @@ const PokemonCard = ({ pokemon, index, owned }) => {
       </div>
       <div className="w-[50%]">
         <p className="text-lg sm:text-base mb-0.5">Stats</p>
-        <p className="sm:text-xs">Evolution: {pokemon.evolution}</p>
+        <p className="sm:text-xs">Evolution: {stars}</p>
         <p className="sm:text-xs">Elements: {pokemon.elements.toString()}</p>
         <p className="sm:text-xs">Weaknesses: {pokemon.weaknesses.toString()}</p>
+        <p className="sm:text-xs">Training cooldown: {trainingCooldown}min</p>
         <div className="mt-1">
           <p className="text-lg sm:text-base">Skills</p>
           <span>

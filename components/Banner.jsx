@@ -25,6 +25,11 @@ const Banner = ({ contract }) => {
     },
   });
 
+  let stars = "";
+  for (let i = 0; i < eventData?.data[3].toNumber(); i++) {
+    stars.concat("⭐");
+  }
+
   let message =
     eventData.event == "eventNewPokemon"
       ? eventData?.data[0].substring(0, 5) +
@@ -39,9 +44,20 @@ const Banner = ({ contract }) => {
         "[" +
         eventData?.data[5].toString() +
         "]. "
-      : eventData?.event == "eventPokemonTrained"
-      ? "eventPokemonTrained MESSAGE"
-      : "";
+      : // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      eventData?.event == "eventPokemonTrained"
+      ? // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        eventData?.data[1] +
+        " owned by " +
+        eventData?.data[0].substring(0, 5) +
+        "..." +
+        eventData?.data[0].substring(38, 42) +
+        +" has evolved " +
+        stars +
+        "and has learn the skill" +
+        eventData?.data[4]
+      : // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        "";
   console.log(message);
 
   useEffect(() => {
