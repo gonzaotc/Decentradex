@@ -20,7 +20,7 @@ const Home = () => {
   const [modal, setModal] = useState({ display: false, content: "" });
 
   const contract = {
-    addressOrName: "0x93a0F6ddB5A03A69D65Fa8F6612FB858d3d48b24",
+    addressOrName: "0xD093c851a58A3402d5cA6893902116cA084501B7",
     contractInterface: abi,
   };
 
@@ -43,7 +43,7 @@ const Home = () => {
         functionName: "getAllSkills",
       },
     ],
-    watch: true,
+     watch: true,
   });
 
   // Get data from blockchain -> when:
@@ -55,29 +55,34 @@ const Home = () => {
   // 2. The user changes address
 
   useEffect(() => {
-    console.log("data from blockchain read has changed:", data);
-    setLoadingPokemons(true);
-    const owned = [];
-    const notOwned = [];
-    console.log(data);
-    data[0].forEach(pokemon => {
-      const formattedPokemon = {
-        owner: pokemon.owner,
-        name: pokemon.name,
-        id: pokemon.id.toString(),
-        color: pokemon.color,
-        evolution: +(pokemon.evolution.toString()),
-        elements: pokemon.elements,
-        weaknesses: pokemon.weaknesses,
-        skills: pokemon.skills,
-        lastTimeTrained: pokemon.lastTimeTrained.toString(),
-      };
-      pokemon.owner == address ? owned.push(formattedPokemon) : notOwned.push(formattedPokemon);
-    });
-    setOwnedPokemons(owned);
-    setNotOwnedPokemons(notOwned);
-    setLoadingPokemons(false);
+    if (data) {
+      console.log("data from blockchain read has changed:", data);
+      setLoadingPokemons(true);
+      const owned = [];
+      const notOwned = [];
+      data[0].forEach(pokemon => {
+        const formattedPokemon = {
+          owner: pokemon.owner,
+          name: pokemon.name,
+          id: pokemon.id.toString(),
+          color: pokemon.color,
+          evolution: +pokemon.evolution.toString(),
+          elements: pokemon.elements,
+          weaknesses: pokemon.weaknesses,
+          skills: pokemon.skills,
+          lastTimeTrained: pokemon.lastTimeTrained.toString(),
+        };
+        pokemon.owner == address ? owned.push(formattedPokemon) : notOwned.push(formattedPokemon);
+      });
+      setOwnedPokemons(owned);
+      setNotOwnedPokemons(notOwned);
+      setLoadingPokemons(false);
+    }
   }, [address, data]);
+
+  const handleCloseModal = () => {
+    setModal({ display: false, content: "" });
+  };
 
   return (
     <div className={`bg-zinc-900 flex flex-col items-center min-h-screen `}>
@@ -90,17 +95,14 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* <Banner contract={contract} /> */}
+      <Banner contract={contract} />
       <div className="w-11/12 flex flex-col items-center">
         {modal.display && (
-          <Modal
-            contract={contract}
-            onClose={() => {
-              setModal({ display: false, content: "" });
-            }}
-          >
-            {/* {modal.content == "mint" && <Mint contract={contract} ownedPokemons={ownedPokemons} />}
-            {modal.content == "train" && <Train contract={contract} />} */}
+          <Modal contract={contract} onClose={handleCloseModal}>
+            {modal.content == "mint" && <Mint contract={contract} onClose={handleCloseModal} />}
+            {modal.content == "train" && (
+              <Train contract={contract} ownedPokemons={ownedPokemons} onClose={handleCloseModal} />
+            )}
           </Modal>
         )}
         <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">

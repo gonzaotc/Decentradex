@@ -1,15 +1,26 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Loading, Tooltip, css } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Error from "../icons/Error";
+import { MINS_COOLDOWN } from "../pages/_app";
 
-const Train = ({ contract, ownedPokemons }) => {
+const Train = ({ contract, ownedPokemons, onClose }) => {
+  console.log(ownedPokemons);
   const [id, setId] = useState("");
   const [inputError, setInputError] = useState({ display: false, error: "" });
   const [firstInputRender, setFirstInputRender] = useState(true);
 
   const isOwned = id => {
     return ownedPokemons.some(pokemon => pokemon.id == id);
+  };
+
+  const isInCooldown = id => {
+    const pokemon = ownedPokemons.find(pokemon => pokemon.id == id);
+    const lastTimeTrained = pokemon.lastTimeTrained;
+    const minsSinceLastTrain = (new Date().getTime() / 1000 - lastTimeTrained) / 60;
+    console.log(minsSinceLastTrain);
+    console.log("isInCooldown: ", minsSinceLastTrain < MINS_COOLDOWN);
+    return minsSinceLastTrain < MINS_COOLDOWN;
   };
 
   // The contractNameArg will be set in the mintButton call, to evitate
@@ -50,7 +61,11 @@ const Train = ({ contract, ownedPokemons }) => {
         setInputError({ display: true, error: "You must own the pokemon" });
       }
       if (isOwned(id)) {
-        setInputError({ display: false, error: "" });
+        if (isInCooldown(id)) {
+          setInputError({ display: true, error: "The training is in cooldown" });
+        } else {
+          setInputError({ display: false, error: "" });
+        }
       }
     }
   }, [id]);
@@ -121,13 +136,13 @@ const Train = ({ contract, ownedPokemons }) => {
           }}
         >
           <p className="mr-2">
-            {isTrainLoading && "Waiting confirmation"}
+            {isTrainingLoading && "Waiting confirmation"}
             {isTrainingError && "Transaction rejected. Try Again"}
             {isTxError && "Transaction error"}
             {isTxLoading && "Waiting transaction"}
             {isTxSuccess && "Transaction processed!"}
 
-            {!isTrainLoading &&
+            {!isTrainingLoading &&
               !isTrainingError &&
               !isTxLoading &&
               !isTxError &&
@@ -135,7 +150,7 @@ const Train = ({ contract, ownedPokemons }) => {
               "TRAIN POKEMON"}
           </p>
 
-          {(isTrainLoading || isTxLoading) && (
+          {(isTrainingLoading || isTxLoading) && (
             <Loading size="sm" color="currentColor" textColor={"primary"} />
           )}
         </button>

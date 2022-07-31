@@ -13,8 +13,8 @@ contract PokemonFactory {
         address owner;
         string name;
         uint256 id;
-        uint256[] color;
         uint256 evolution;
+        uint256[] color;
         string[] elements;
         string[] weaknesses;
         Skill[] skills;
@@ -27,7 +27,8 @@ contract PokemonFactory {
         uint256 id,
         uint256[] color,
         string[] elements,
-        string[] weaknesses
+        string[] weaknesses,
+        Skill skill
     );
 
     event eventPokemonTrained(
@@ -39,9 +40,19 @@ contract PokemonFactory {
         uint256 skillId
     );
 
+    event eventPokemonTrainedFail(
+        address owner,
+        string pokemonName,
+        uint256 pokemonId
+    );
+
+    error CooldownNotFinished(uint256 passed, uint256 totalCooldown);
+
     mapping(uint256 => address) private s_pokemonIdToOwner;
     mapping(address => uint256) private s_ownerPokemonCount;
 
+    // training cooldown in seconds
+    uint256 private constant COOLDOWN = 60; 
     Pokemon[] private s_pokemons;
     Skill[] private i_skills;
     string[18] private i_elements = [
@@ -172,6 +183,15 @@ contract PokemonFactory {
             _elementIndex4 = _elementIndex3;
         }
 
+        // get a random skill number.
+        uint256 skillIndex = getRandom(
+            0,
+            i_skills.length - 1,
+            _name,
+            _id,
+            block.timestamp
+        );
+
         uint256[] memory _color = new uint256[](3);
         rCounter++;
         _color[0] = getRandom(0, 255, _name, _id, rCounter);
@@ -187,9 +207,10 @@ contract PokemonFactory {
         pokemon.name = _name;
         pokemon.id = _id;
         pokemon.color = _color;
-        pokemon.evolution = 0;
+        pokemon.evolution = 1;
         pokemon.weaknesses = _weaknesses;
         pokemon.elements = _elements;
+        pokemon.skills.push(i_skills[skillIndex]);
         pokemon.lastTimeTrained = block.timestamp;
 
         s_ownerPokemonCount[msg.sender]++;
@@ -200,9 +221,9 @@ contract PokemonFactory {
             _id,
             _color,
             _elements,
-            _weaknesses
+            _weaknesses,
+            i_skills[skillIndex]
         );
-        // trainPokemon(_id);
     }
 
     function trainPokemon(uint256 _id) public {
@@ -211,14 +232,13 @@ contract PokemonFactory {
             "The pokemon must exist and must belong to you to be trained."
         );
         require(
-            s_pokemons[_id].evolution < 3,
-            "The pokemon can't evolve from evolution 3."
+            s_pokemons[_id].evolution < 5,
+            "The pokemon can't evolve from evolution 5."
         );
 
-        require(
-            block.timestamp - s_pokemons[_id].lastTimeTrained > 3600,
-            "The training cooldown of one hour has not yet finished"
-        );
+        if (block.timestamp - s_pokemons[_id].lastTimeTrained < COOLDOWN) {
+            revert CooldownNotFinished({passed: block.timestamp - s_pokemons[_id].lastTimeTrained, totalCooldown: COOLDOWN});
+        }
 
         // array that have the pokemon skills, with the ids.
         Skill[] memory skills = s_pokemons[_id].skills;
@@ -237,6 +257,8 @@ contract PokemonFactory {
         // evolution 0 -> 1: i_skills.length = 6, skills = 0.  => possibility: 6/6 = 100%
         // evolution 1 -> 2: i_skills.length = 6, skills = 1.  => possibility: 5/6 = 83%
         // evolution 2 -> 3: i_skills.length = 6, skills = 2.  => possibility: 4/6 = 66%
+        // evolution 3 -> 4: i_skills.length = 6, skills = 3.  => possibility: 3/6 = 50%
+        // evolution 4 -> 5: i_skills.length = 6, skills = 4.  => possibility: 2/6 = 33%
 
         bool alreadySkill = false;
         for (uint256 i = 0; i < skills.length; i++) {
@@ -245,22 +267,30 @@ contract PokemonFactory {
                 break;
             }
         }
-        require(
-            !alreadySkill,
-            "The training was good, but the pokemon didn't evolve."
-        );
 
-        s_pokemons[_id].evolution++;
-        Skill memory skill = i_skills[skillIndex];
-        s_pokemons[_id].skills.push(skill);
-        emit eventPokemonTrained(
-            msg.sender,
-            s_pokemons[_id].name,
-            _id,
-            s_pokemons[_id].evolution,
-            skill.name,
-            skill.id
-        );
+        if (!alreadySkill){
+            s_pokemons[_id].evolution++;
+            Skill memory skill = i_skills[skillIndex];
+            s_pokemons[_id].skills.push(skill);
+
+            emit eventPokemonTrained(
+                msg.sender,
+                s_pokemons[_id].name,
+                _id,
+                s_pokemons[_id].evolution,
+                skill.name,
+                skill.id
+            );
+        }
+        else {
+            emit eventPokemonTrainedFail(
+                msg.sender,
+                s_pokemons[_id].name,
+                _id
+            );
+        }
+
+        s_pokemons[_id].lastTimeTrained = block.timestamp;
     }
 
     function getAllPokemons() public view returns (Pokemon[] memory) {
@@ -273,14 +303,6 @@ contract PokemonFactory {
 
     function getPokemonOwnerById(uint256 _id) public view returns (address) {
         return s_pokemonIdToOwner[_id];
-    }
-
-    function getAmountOwnedByAddress(address _address)
-        public
-        view
-        returns (uint256)
-    {
-        return s_ownerPokemonCount[_address];
     }
 
     function getAllElements() public view returns (string[18] memory) {

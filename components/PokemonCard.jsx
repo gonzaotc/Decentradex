@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Tooltip } from "@nextui-org/react";
 import Info from "../icons/Info";
+import Emoji from "./Emoji";
+import { MINS_COOLDOWN } from "../pages/_app";
 
 const PokemonCard = ({ pokemon, index, owned }) => {
   const pokeColor = [];
@@ -19,17 +21,12 @@ const PokemonCard = ({ pokemon, index, owned }) => {
     pokeDropShadow +
     pokeDropShadow;
 
-  let stars = "";
-  for (let i = 0; i < pokemon.evolution; i++) {
-    stars.concat("⭐");
-  }
-  console.log(stars)
-
-  const MINS_COOLDOWN = 60;
   let dateNow = Math.round(new Date().getTime() / 1000);
   let trainingDiff = Math.round((dateNow - pokemon.lastTimeTrained) / 60);
-  // If training diff (minuts> 60 -> show ready. If not, show 60 - trainingDiff )
-  let trainingCooldown = Math.round(trainingDiff > MINS_COOLDOWN ? 0 : MINS_COOLDOWN - trainingDiff );
+  // If training diff (minuts> MINS_COOLDOWN -> show ready. If not, show 60 - trainingDiff )
+  let trainingCooldown = Math.round(
+    trainingDiff > MINS_COOLDOWN ? 0 : MINS_COOLDOWN - trainingDiff
+  );
 
   return (
     <article
@@ -53,10 +50,19 @@ const PokemonCard = ({ pokemon, index, owned }) => {
       </div>
       <div className="w-[50%]">
         <p className="text-lg sm:text-base mb-0.5">Stats</p>
-        <p className="sm:text-xs">Evolution: {stars}</p>
+        <p className="sm:text-xs">
+          Evolution:
+          {Array.from(new Array(+pokemon.evolution.toString())).map((item, index) => (
+            <Emoji symbol="⭐" label="star" key={index} amount={+pokemon.evolution.toString()} />
+          ))}
+        </p>
         <p className="sm:text-xs">Elements: {pokemon.elements.toString()}</p>
         <p className="sm:text-xs">Weaknesses: {pokemon.weaknesses.toString()}</p>
-        <p className="sm:text-xs">Training cooldown: {trainingCooldown}min</p>
+        <p className="sm:text-xs">
+          {trainingCooldown > 0
+            ? "Training cooldown: " + trainingCooldown + "mins"
+            : "ready to be trained"}
+        </p>
         <div className="mt-1">
           <p className="text-lg sm:text-base">Skills</p>
           <span>

@@ -35,4 +35,23 @@ p {
   gap: 10px;
 }
 
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input {
+  outline: none;
+}
+
+.emoji-color{
+text-shadow: 0 0 0 orange;
+color: transparent;
+}

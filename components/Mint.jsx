@@ -3,7 +3,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from
 import { Loading, Tooltip, css } from "@nextui-org/react";
 import Error from "../icons/Error";
 
-const Mint = ({contract}) => {
+const Mint = ({contract, onClose}) => {
   const [name, setName] = useState("");
   const [inputError, setInputError] = useState({ display: false, error: "" });
   const [firstInputRender, setFirstInputRender] = useState(true);
