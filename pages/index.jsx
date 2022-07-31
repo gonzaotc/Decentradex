@@ -20,7 +20,7 @@ const Home = () => {
   const [modal, setModal] = useState({ display: false, content: "" });
 
   const contract = {
-    addressOrName: "0x4b76d2f2818265d7aa5e1df3ab0e44a4406a7e30",
+    addressOrName: "0x93a0F6ddB5A03A69D65Fa8F6612FB858d3d48b24",
     contractInterface: abi,
   };
 
@@ -66,7 +66,7 @@ const Home = () => {
         name: pokemon.name,
         id: pokemon.id.toString(),
         color: pokemon.color,
-        evolution: pokemon.evolution.toString(),
+        evolution: +(pokemon.evolution.toString()),
         elements: pokemon.elements,
         weaknesses: pokemon.weaknesses,
         skills: pokemon.skills,
@@ -90,7 +90,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Banner contract={contract} />
+      {/* <Banner contract={contract} /> */}
       <div className="w-11/12 flex flex-col items-center">
         {modal.display && (
           <Modal
@@ -99,8 +99,8 @@ const Home = () => {
               setModal({ display: false, content: "" });
             }}
           >
-            {modal.content == "mint" && <Mint contract={contract} ownedPokemons={ownedPokemons} />}
-            {modal.content == "train" && <Train contract={contract} />}
+            {/* {modal.content == "mint" && <Mint contract={contract} ownedPokemons={ownedPokemons} />}
+            {modal.content == "train" && <Train contract={contract} />} */}
           </Modal>
         )}
         <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">

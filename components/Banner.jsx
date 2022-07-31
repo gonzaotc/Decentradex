@@ -21,13 +21,15 @@ const Banner = ({ contract }) => {
     eventName: "eventPokemonTrained",
     listener: event => {
       console.log(event);
-      setEventData({ event: "eventNewPokemon", data: event });
+      setEventData({ event: "eventPokemonTrained", data: event });
     },
   });
 
   let stars = "";
-  for (let i = 0; i < eventData?.data[3].toNumber(); i++) {
-    stars.concat("⭐");
+  if ((eventData.event = "eventPokemonTrained" && eventData.data.length > 0)) {
+    for (let i = 0; i < eventData?.data[3].toString(); i++) {
+      stars.concat("⭐");
+    }
   }
 
   let message =

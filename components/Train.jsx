@@ -1,4 +1,7 @@
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { Loading, Tooltip, css } from "@nextui-org/react";
 import React from "react";
+import Error from "../icons/Error";
 
 const Train = ({ contract, ownedPokemons }) => {
   const [id, setId] = useState("");

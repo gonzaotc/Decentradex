@@ -23,9 +23,13 @@ const PokemonCard = ({ pokemon, index, owned }) => {
   for (let i = 0; i < pokemon.evolution; i++) {
     stars.concat("⭐");
   }
+  console.log(stars)
 
-  let trainingDiff = new Date.now() - +pokemon.lastTimeTrained;
-  let pokemonCooldown = trainingDiff < 3600 ? trainingDiff / 60 : 0;
+  const MINS_COOLDOWN = 60;
+  let dateNow = Math.round(new Date().getTime() / 1000);
+  let trainingDiff = Math.round((dateNow - pokemon.lastTimeTrained) / 60);
+  // If training diff (minuts> 60 -> show ready. If not, show 60 - trainingDiff )
+  let trainingCooldown = Math.round(trainingDiff > MINS_COOLDOWN ? 0 : MINS_COOLDOWN - trainingDiff );
 
   return (
     <article
