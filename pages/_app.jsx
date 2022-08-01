@@ -6,11 +6,14 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { NextUIProvider } from "@nextui-org/react";
 
+export const MINS_COOLDOWN = 1;
+
 const { chains, provider, webSocketProvider } = configureChains(
   [
     // chain.mainnet,
-    // chain.polygon,
     chain.goerli,
+    // chain.polygonMumbai,
+    // chain.polygon,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
       ? [chain.goerli, chain.kovan, chain.rinkeby, chain.ropsten]
       : []),

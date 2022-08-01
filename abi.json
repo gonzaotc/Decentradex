@@ -2,19 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "_name",
-        "type": "string"
-      }
-    ],
-    "name": "createPokemon",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
           {
             "internalType": "uint256",
@@ -39,6 +26,22 @@
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "passed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalCooldown",
+        "type": "uint256"
+      }
+    ],
+    "name": "CooldownNotFinished",
+    "type": "error"
   },
   {
     "anonymous": false,
@@ -78,6 +81,29 @@
         "internalType": "string[]",
         "name": "weaknesses",
         "type": "string[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct PokemonFactory.Skill",
+        "name": "skill",
+        "type": "tuple"
       }
     ],
     "name": "eventNewPokemon",
@@ -127,14 +153,39 @@
     "type": "event"
   },
   {
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "pokemonName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
-        "name": "_id",
+        "name": "pokemonId",
         "type": "uint256"
       }
     ],
-    "name": "trainPokemon",
+    "name": "eventPokemonTrainedFail",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "createPokemon",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -174,14 +225,14 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint256[]",
-            "name": "color",
-            "type": "uint256[]"
-          },
-          {
             "internalType": "uint256",
             "name": "evolution",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "color",
+            "type": "uint256[]"
           },
           {
             "internalType": "string[]",
@@ -214,6 +265,11 @@
             "internalType": "struct PokemonFactory.Skill[]",
             "name": "skills",
             "type": "tuple[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lastTimeTrained",
+            "type": "uint256"
           }
         ],
         "internalType": "struct PokemonFactory.Pokemon[]",
@@ -257,25 +313,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_address",
-        "type": "address"
-      }
-    ],
-    "name": "getAmountOwnedByAddress",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "_id",
         "type": "uint256"
@@ -301,14 +338,14 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint256[]",
-            "name": "color",
-            "type": "uint256[]"
-          },
-          {
             "internalType": "uint256",
             "name": "evolution",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "color",
+            "type": "uint256[]"
           },
           {
             "internalType": "string[]",
@@ -341,6 +378,11 @@
             "internalType": "struct PokemonFactory.Skill[]",
             "name": "skills",
             "type": "tuple[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lastTimeTrained",
+            "type": "uint256"
           }
         ],
         "internalType": "struct PokemonFactory.Pokemon",
@@ -368,6 +410,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "trainPokemon",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
