@@ -3,7 +3,8 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from
 import { Loading, Tooltip, css } from "@nextui-org/react";
 import Error from "../icons/Error";
 
-const Mint = ({contract, onClose}) => {
+
+const Mint = ({ contract, onClose }) => {
   const [name, setName] = useState("");
   const [inputError, setInputError] = useState({ display: false, error: "" });
   const [firstInputRender, setFirstInputRender] = useState(true);
@@ -34,6 +35,7 @@ const Mint = ({contract, onClose}) => {
     isSuccess: isTxSuccess,
     isLoading: isTxLoading,
     isError: isTxError,
+    error: txError,
   } = useWaitForTransaction({
     hash: mintData?.hash,
   });
@@ -44,21 +46,16 @@ const Mint = ({contract, onClose}) => {
     if (!firstInputRender) {
       if (name.length < 2) {
         setInputError({ display: true, error: "The name length must be > 2" });
-      }
-      if (name.length >= 2 && name.length <= 20) {
+      } else if (name.length > 12) {
+        setInputError({ display: true, error: "The name length must be < 12" });
+      } else if (name.length >= 2 && name.length <= 12) {
         setInputError({ display: false, error: "" });
-      }
-      if (name.length > 10) {
-        setInputError({ display: true, error: "The name length must be < 10" });
+        // !!mint
+        //   ? setInputError({ display: false, error: "" })
+        //   : setInputError({ display: true, error: "Unknown error. Try with other" });
       }
     }
-  }, [name]);
-  {
-    /* mintData, isMintLoading, isMintStarted, isMintingError*/
-  }
-  {
-    /* isTxSuccess, isTxLoading,  isTxError */
-  }
+  }, [name, mint]);
 
   useEffect(() => {
     if (isTxSuccess) {
@@ -70,7 +67,7 @@ const Mint = ({contract, onClose}) => {
     console.log("trigering onMintPokemon");
     // Falta agregar debouncing al minting
     setContractNameArg(name);
-    mint();
+    mint && mint();
   };
 
   return (
@@ -99,10 +96,12 @@ const Mint = ({contract, onClose}) => {
       {/* isTxSuccess, isTxLoading,  isTxError */}
       <Tooltip
         content={
-          isMintingError && (
+          (isMintingError || isTxError) && (
             <span className="flex items-center">
               <Error className="w-5 h-5 mr-1 text-red-500" />
-              <p className="text-red-500">{mintingError.toString()}</p>
+              <p className="text-red-500">
+                {isMintingError ? mintingError.toString() : txError.toString()}
+              </p>
             </span>
           )
         }
@@ -124,8 +123,8 @@ const Mint = ({contract, onClose}) => {
             {isMintLoading && "Waiting confirmation"}
             {isMintingError && "Transaction rejected. Try Again"}
             {isTxError && "Transaction error"}
-            {isTxLoading && "Waiting transaction"}
-            {isTxSuccess && "Transaction processed!"}
+            {isTxLoading && "Processing transaction"}
+            {isTxSuccess && "Transaction success!"}
 
             {!isMintLoading &&
               !isMintingError &&

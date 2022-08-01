@@ -16,10 +16,8 @@ const Train = ({ contract, ownedPokemons, onClose }) => {
 
   const isInCooldown = id => {
     const pokemon = ownedPokemons.find(pokemon => pokemon.id == id);
-    const lastTimeTrained = pokemon.lastTimeTrained;
+    const lastTimeTrained = +pokemon.lastTimeTrained.toString();
     const minsSinceLastTrain = (new Date().getTime() / 1000 - lastTimeTrained) / 60;
-    console.log(minsSinceLastTrain);
-    console.log("isInCooldown: ", minsSinceLastTrain < MINS_COOLDOWN);
     return minsSinceLastTrain < MINS_COOLDOWN;
   };
 
@@ -45,10 +43,15 @@ const Train = ({ contract, ownedPokemons, onClose }) => {
     ...config,
   });
 
+  useEffect(() => {
+    console.log("train has changed", !!train);
+  }, [train]);
+
   const {
     isSuccess: isTxSuccess,
     isLoading: isTxLoading,
     isError: isTxError,
+    error: txError,
   } = useWaitForTransaction({
     hash: mintData?.hash,
   });
@@ -64,17 +67,13 @@ const Train = ({ contract, ownedPokemons, onClose }) => {
         if (isInCooldown(id)) {
           setInputError({ display: true, error: "The training is in cooldown" });
         } else {
-          setInputError({ display: false, error: "" });
+          !!train
+            ? setInputError({ display: false, error: "" })
+            : setInputError({ display: true, error: "Unknown error. Try with other" });
         }
       }
     }
-  }, [id]);
-  {
-    /* mintData, isMintLoading, isMintStarted, isMintingError*/
-  }
-  {
-    /* isTxSuccess, isTxLoading,  isTxError */
-  }
+  }, [id, train]);
 
   useEffect(() => {
     if (isTxSuccess) {
@@ -86,7 +85,7 @@ const Train = ({ contract, ownedPokemons, onClose }) => {
     console.log("trigering onTrainPokemon");
     // Falta agregar debouncing al minting
     setContractNameArg(id);
-    train();
+    train && train();
   };
   return (
     <>
@@ -110,14 +109,15 @@ const Train = ({ contract, ownedPokemons, onClose }) => {
           )}
         </span>
       </span>
-      {/* mintData, isMintLoading, isMintStarted, isMintingError*/}
-      {/* isTxSuccess, isTxLoading,  isTxError */}
+
       <Tooltip
         content={
-          isTrainingError && (
+          (isTrainingError || isTxError) && (
             <span className="flex items-center">
               <Error className="w-5 h-5 mr-1 text-red-500" />
-              <p className="text-red-500">{trainingError.toString()}</p>
+              <p className="text-red-500">
+                {isTrainingError ? trainingError.toString() : txError.toString()}
+              </p>
             </span>
           )
         }
@@ -139,8 +139,8 @@ const Train = ({ contract, ownedPokemons, onClose }) => {
             {isTrainingLoading && "Waiting confirmation"}
             {isTrainingError && "Transaction rejected. Try Again"}
             {isTxError && "Transaction error"}
-            {isTxLoading && "Waiting transaction"}
-            {isTxSuccess && "Transaction processed!"}
+            {isTxLoading && "Processing transaction"}
+            {isTxSuccess && "Transaction success!"}
 
             {!isTrainingLoading &&
               !isTrainingError &&

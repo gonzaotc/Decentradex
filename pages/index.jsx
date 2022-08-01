@@ -9,6 +9,8 @@ import PokemonContainer from "../components/PokemonContainer";
 import Banner from "../components/Banner";
 import Mint from "../components/Mint";
 import Train from "../components/Train";
+import { Tooltip } from "@nextui-org/react";
+import Info from "../icons/Info";
 
 const Home = () => {
   const { address } = useAccount();
@@ -43,7 +45,7 @@ const Home = () => {
         functionName: "getAllSkills",
       },
     ],
-     watch: true,
+    watch: true,
   });
 
   // Get data from blockchain -> when:
@@ -55,7 +57,7 @@ const Home = () => {
   // 2. The user changes address
 
   useEffect(() => {
-    if (data) {
+    if (data && data[0]) {
       console.log("data from blockchain read has changed:", data);
       setLoadingPokemons(true);
       const owned = [];
@@ -106,7 +108,12 @@ const Home = () => {
           </Modal>
         )}
         <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">
-          <h1 className="text-[1.4rem] sm:text-3xl">Decentradex</h1>
+          <span className="flex items-center">
+            <h1 className="text-[1.4rem] sm:text-3xl">
+              Decentra<span className="text-green-500">dex</span>
+              {/* <img src="/favicon.ico" className="w-8 h-8 mx-1.5 relative top-0.5" alt="" /> */}
+            </h1>
+          </span>
           <ConnectButton accountStatus="address" />
         </nav>
 
@@ -116,7 +123,7 @@ const Home = () => {
           </p>
         )}
         {!loadingPokemons && (
-          <main className="w-full flex flex-col">
+          <main className="w-full flex flex-col mb-14">
             <>
               <section className="flex mb-4">
                 {address && ownedPokemons.length < 3 && (
@@ -130,18 +137,33 @@ const Home = () => {
                   </button>
                 )}
                 {ownedPokemons.length > 0 && (
-                  <button
-                    className="btn w-full sm:w-auto"
-                    onClick={() => {
-                      setModal({ display: true, content: "train" });
-                    }}
+                  <Tooltip
+                    content={
+                      <span className="flex items-center">
+                        <Info className="w-5 h-5 mr-1" />
+                        <p className="text-sm">
+                          The training can success or fail, where each evolution is harder to
+                          achieve.
+                        </p>
+                      </span>
+                    }
+                    placement="right"
+                    color="invert"
+                    rounded={false}
                   >
-                    Train Pokemon
-                  </button>
+                    <button
+                      className="btn w-full sm:w-auto"
+                      onClick={() => {
+                        setModal({ display: true, content: "train" });
+                      }}
+                    >
+                      Train Pokemon
+                    </button>
+                  </Tooltip>
                 )}
               </section>
-              {address && (
-                <section className="mb-4">
+              {address ? (
+                <section className="mb-6">
                   <h2 className="mb-3">Your pokemons</h2>
                   <PokemonContainer className="">
                     {ownedPokemons.map((pokemon, index) => (
@@ -152,8 +174,15 @@ const Home = () => {
                     )}
                   </PokemonContainer>
                 </section>
+              ) : (
+                <span className="mb-8">
+                  <h3 className="text-green-500">
+                    Connect your wallet before interacting with the dApp.
+                  </h3>
+                  {/* <p className="text-white">We recommend using MetaMask</p> */}
+                </span>
               )}
-              <section className="mb-4">
+              <section className="mb-6">
                 <h2 className="mb-3">All the pokemons</h2>
                 <PokemonContainer className="">
                   {notOwnedPokemons.map((pokemon, index) => {
@@ -167,6 +196,26 @@ const Home = () => {
             </>
           </main>
         )}
+        <footer className=" w-full h-16 mb-4 text-white flex flex-col items-center">
+          <p>
+            Small fullstack web3 weekend project. More about me:{" "}
+            <a
+              href="https://react-eth-challenge-alpha.vercel.app/"
+              target="_blank"
+              className="text-green-500 font-semibold"
+            >
+              gonzaotc.eth
+            </a>
+          </p>
+          <a
+            href="https://platzi.com/cursos/ethereum-dev-program/"
+            target="_blank"
+            className="text-sm"
+          >
+            This is part of the <span className="text-green-500 font-semibold">Platzi </span>
+            Ethereum Developer Program 2022
+          </a>
+        </footer>
       </div>
     </div>
   );

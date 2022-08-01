@@ -51,7 +51,6 @@ contract PokemonFactory {
     mapping(uint256 => address) private s_pokemonIdToOwner;
     mapping(address => uint256) private s_ownerPokemonCount;
 
-    // training cooldown in seconds
     uint256 private constant COOLDOWN = 60; 
     Pokemon[] private s_pokemons;
     Skill[] private i_skills;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useContractEvent } from "wagmi";
 import Info from "../icons/Info";
+import { getAddressShortcut } from "../utils";
 
 const Banner = ({ contract }) => {
   const [eventData, setEventData] = useState(undefined);
@@ -35,9 +36,7 @@ const Banner = ({ contract }) => {
       console.log(eventData);
       eventData.event == "eventNewPokemon" &&
         setMessage(
-          eventData?.data[0].substring(0, 5) +
-            "..." +
-            eventData?.data[0].substring(38, 42) +
+          getAddressShortcut(eventData?.data[0]) +
             " has just minted " +
             eventData?.data[1] +
             " who is type [" +
@@ -46,23 +45,22 @@ const Banner = ({ contract }) => {
             " and weak to " +
             "[" +
             eventData?.data[5].toString() +
-            "]. "
+            "]"
         );
       eventData?.event == "eventPokemonTrained" &&
         setMessage(
           eventData?.data[1] +
-            "who is owned by " +
-            eventData?.data[0].substring(0, 5) +
-            "..." +
-            eventData?.data[0].substring(38, 42) +
-            +" has evolved to evolution" +
-            eventData?.data[3].toString() +
+            " who is owned by " +
+            getAddressShortcut(eventData?.data[0]) +
+            " has evolved to evolution " +
+            +eventData?.data[3].toString() +
             " and has learn the skill " +
             eventData?.data[4]
         );
       setTimeout(() => {
-        setEventData({ event: "", eventData: ["", "", "", "", "", "", ""] });
-      }, 15000);
+        setEventData(undefined);
+        setMessage("");
+      }, 20000);
     }
   }, [eventData]);
 
@@ -78,8 +76,8 @@ const Banner = ({ contract }) => {
         }`}
       >
         <div className="flex items-center justify-center">
-          {message && <Info className="text-green-600 w-[23px] h-[23px] mr-0.5" />}
-          <p className="relative bottom-[1px] font-medium text-base text-green-700">{message}</p>
+          {message && <Info className="text-green-800 w-[24px] h-[24px] mr-1" />}
+          <p className="relative bottom-[1px] font-medium text-base text-green-800">{message}</p>
         </div>
       </div>
     </>
