@@ -163,6 +163,15 @@ const Home = () => {
                     </Tooltip>
                   )}
                 </section>
+                {address && (
+                  <a
+                    className="font-semibold mb-4 text-green-500"
+                    href="https://goerlifaucet.com/"
+                    target="_blank"
+                  >
+                    Click here to claim free Goerli ETH to test this dApp
+                  </a>
+                )}
                 {address ? (
                   <section className="mb-6">
                     <h2 className="mb-3">Your pokemons</h2>
