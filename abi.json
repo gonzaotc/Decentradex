@@ -44,19 +44,6 @@
     "type": "error"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_name",
-        "type": "string"
-      }
-    ],
-    "name": "createPokemon",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -193,12 +180,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_id",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
       }
     ],
-    "name": "trainPokemon",
+    "name": "createPokemon",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -238,14 +225,14 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint256[]",
-            "name": "color",
-            "type": "uint256[]"
-          },
-          {
             "internalType": "uint256",
             "name": "evolution",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "color",
+            "type": "uint256[]"
           },
           {
             "internalType": "string[]",
@@ -351,14 +338,14 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint256[]",
-            "name": "color",
-            "type": "uint256[]"
-          },
-          {
             "internalType": "uint256",
             "name": "evolution",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "color",
+            "type": "uint256[]"
           },
           {
             "internalType": "string[]",
@@ -423,6 +410,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "trainPokemon",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

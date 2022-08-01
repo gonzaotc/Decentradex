@@ -22,7 +22,7 @@ const Home = () => {
   const [modal, setModal] = useState({ display: false, content: "" });
 
   const contract = {
-    addressOrName: "0xD093c851a58A3402d5cA6893902116cA084501B7",
+    addressOrName: "0x5be38C4228bbE2B6313826Ed3C29821c0f7e5340",
     contractInterface: abi,
   };
 
@@ -87,7 +87,7 @@ const Home = () => {
   };
 
   return (
-    <div className={`bg-zinc-900 flex flex-col items-center min-h-screen `}>
+    <div className={`bg-zinc-900 flex flex-col items-center min-h-screen`}>
       <Head>
         <title>Decentradex</title>
         <meta
@@ -98,7 +98,7 @@ const Home = () => {
       </Head>
 
       <Banner contract={contract} />
-      <div className="w-11/12 flex flex-col items-center">
+      <div className="w-11/12 h-full flex flex-col items-center min-h-screen ">
         {modal.display && (
           <Modal contract={contract} onClose={handleCloseModal}>
             {modal.content == "mint" && <Mint contract={contract} onClose={handleCloseModal} />}
@@ -107,7 +107,7 @@ const Home = () => {
             )}
           </Modal>
         )}
-        <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-b-2 border-white/10">
+        <nav className="w-full flex justify-between items-center pb-2 mt-2 mb-6 border-white/10 border-b-2">
           <span className="flex items-center">
             <h1 className="text-[1.4rem] sm:text-3xl">
               Decentra<span className="text-green-500">dex</span>
@@ -123,99 +123,104 @@ const Home = () => {
           </p>
         )}
         {!loadingPokemons && (
-          <main className="w-full flex flex-col mb-14">
-            <>
-              <section className="flex mb-4">
-                {address && ownedPokemons.length < 3 && (
-                  <button
-                    className="btn mr-2 w-full sm:w-auto"
-                    onClick={() => {
-                      setModal({ display: true, content: "mint" });
-                    }}
-                  >
-                    Mint Pokemon
-                  </button>
-                )}
-                {ownedPokemons.length > 0 && (
-                  <Tooltip
-                    content={
-                      <span className="flex items-center">
-                        <Info className="w-5 h-5 mr-1" />
-                        <p className="text-sm">
-                          The training can success or fail, where each evolution is harder to
-                          achieve.
-                        </p>
-                      </span>
-                    }
-                    placement="right"
-                    color="invert"
-                    rounded={false}
-                  >
+          <>
+            <main className="w-full flex flex-col mb-14 ">
+              <>
+                <section className="flex mb-4">
+                  {address && ownedPokemons.length < 3 && (
                     <button
-                      className="btn w-full sm:w-auto"
+                      className="btn mr-2 w-full sm:w-auto"
                       onClick={() => {
-                        setModal({ display: true, content: "train" });
+                        setModal({ display: true, content: "mint" });
                       }}
                     >
-                      Train Pokemon
+                      Mint Pokemon
                     </button>
-                  </Tooltip>
+                  )}
+                  {ownedPokemons.length > 0 && (
+                    <Tooltip
+                      content={
+                        <span className="flex items-center">
+                          <Info className="w-5 h-5 mr-1" />
+                          <p className="text-sm">
+                            The training can success or fail, where each evolution is harder to
+                            achieve.
+                          </p>
+                        </span>
+                      }
+                      placement="right"
+                      color="invert"
+                      rounded={false}
+                    >
+                      <button
+                        className="btn w-full sm:w-auto"
+                        onClick={() => {
+                          setModal({ display: true, content: "train" });
+                        }}
+                      >
+                        Train Pokemon
+                      </button>
+                    </Tooltip>
+                  )}
+                </section>
+                {address ? (
+                  <section className="mb-6">
+                    <h2 className="mb-3">Your pokemons</h2>
+                    <PokemonContainer className="">
+                      {ownedPokemons.map((pokemon, index) => (
+                        <PokemonCard key={index} pokemon={pokemon} owned={true} />
+                      ))}
+                      {ownedPokemons.length === 0 && (
+                        <p className="text-white">You dont own any pokemons.</p>
+                      )}
+                    </PokemonContainer>
+                  </section>
+                ) : (
+                  <span className="mb-8">
+                    <h3 className="text-green-500">
+                      Connect your wallet before interacting with the dApp.
+                    </h3>
+                    {/* <p className="text-white">We recommend using MetaMask</p> */}
+                  </span>
                 )}
-              </section>
-              {address ? (
                 <section className="mb-6">
-                  <h2 className="mb-3">Your pokemons</h2>
+                  <h2 className="mb-3">All the pokemons</h2>
                   <PokemonContainer className="">
-                    {ownedPokemons.map((pokemon, index) => (
-                      <PokemonCard key={index} pokemon={pokemon} owned={true} />
-                    ))}
-                    {ownedPokemons.length === 0 && (
-                      <p className="text-white">You dont own any pokemons.</p>
+                    {notOwnedPokemons.map((pokemon, index) => {
+                      return <PokemonCard key={index} pokemon={pokemon} />;
+                    })}
+                    {notOwnedPokemons.length === 0 && (
+                      <p className="text-white">There is no cryptopokemons made.</p>
                     )}
                   </PokemonContainer>
                 </section>
-              ) : (
-                <span className="mb-8">
-                  <h3 className="text-green-500">
-                    Connect your wallet before interacting with the dApp.
-                  </h3>
-                  {/* <p className="text-white">We recommend using MetaMask</p> */}
-                </span>
-              )}
-              <section className="mb-6">
-                <h2 className="mb-3">All the pokemons</h2>
-                <PokemonContainer className="">
-                  {notOwnedPokemons.map((pokemon, index) => {
-                    return <PokemonCard key={index} pokemon={pokemon} />;
-                  })}
-                  {notOwnedPokemons.length === 0 && (
-                    <p className="text-white">There is no cryptopokemons made.</p>
-                  )}
-                </PokemonContainer>
-              </section>
-            </>
-          </main>
+              </>
+            </main>
+
+            <footer className="w-full text-white flex flex-col items-center mt-auto mb-3 2xl:mb-6 text-center">
+              <p className="mb-0.5">
+                Small fullstack web3 weekend project. More about me:{" "}
+                <a
+                  href="https://react-eth-challenge-alpha.vercel.app/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-green-500 font-semibold"
+                >
+                  gonzaotc.eth
+                </a>
+              </p>
+              <a
+                href="https://platzi.com/cursos/ethereum-dev-program/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm"
+              >
+                This is part of the <span className="text-green-500 font-semibold">Platzi </span>
+                Ethereum Developer Program 2022
+              </a>
+            </footer>
+          </>
         )}
-        <footer className=" w-full h-16 mb-4 text-white flex flex-col items-center">
-          <p>
-            Small fullstack web3 weekend project. More about me:{" "}
-            <a
-              href="https://react-eth-challenge-alpha.vercel.app/"
-              target="_blank"
-              className="text-green-500 font-semibold"
-            >
-              gonzaotc.eth
-            </a>
-          </p>
-          <a
-            href="https://platzi.com/cursos/ethereum-dev-program/"
-            target="_blank"
-            className="text-sm"
-          >
-            This is part of the <span className="text-green-500 font-semibold">Platzi </span>
-            Ethereum Developer Program 2022
-          </a>
-        </footer>
       </div>
     </div>
   );
