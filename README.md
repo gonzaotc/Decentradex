@@ -1,5 +1,5 @@
 
-### Decentradex: 
+### Weekend fun project: Decentradex: 
 ##### A fun pokemon themed NFT collection made from scratch
 
 Every address can mint up to three pokemons for free. <br>
