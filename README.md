@@ -29,8 +29,5 @@ Have fun!.
 ###### Learning Takeaways
 - I practiced a ton bettering the UX for smart contracts calls through the frontend
 
-##### Demo
-https://www.loom.com/share/d8a5d9544a144def854a3c431b39f466
-
 ##### Live Url (deployed on goerli testnet)
 https://decentradex-gonzaotc.vercel.app/
